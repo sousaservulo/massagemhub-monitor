@@ -1,14 +1,18 @@
 {
   "name": "massagemhub-monitor",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "Monitor externo de saúde e SEO do MassagemHub",
+  "description": "Monitor externo de saúde, SEO e E2E do MassagemHub",
   "type": "module",
   "scripts": {
     "monitor": "node src/index.js",
+    "e2e": "node src/e2e/index.js",
     "test": "node --test"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "playwright": "^1.55.0"
   }
 }

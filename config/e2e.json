@@ -1,0 +1,17 @@
+{
+  "public": [
+    { "path": "/anunciante/login", "name": "Login do anunciante", "expect": "Painel do anunciante" },
+    { "path": "/admin/login", "name": "Login do admin", "expect": "Painel administrativo" }
+  ],
+  "advertiser": [
+    { "path": "/anunciante", "name": "Dashboard do anunciante", "expect": "Dashboard" },
+    { "path": "/anunciante/meu-anuncio", "name": "Meu anúncio", "expectAny": ["Meu anúncio", "Minha clínica"] },
+    { "path": "/anunciante/financeiro", "name": "Financeiro do anunciante", "expect": "Financeiro" }
+  ],
+  "admin": [
+    { "path": "/admin", "name": "Dashboard do admin" },
+    { "path": "/admin/therapists", "name": "Terapeutas no admin" },
+    { "path": "/admin/clinics", "name": "Clínicas no admin" },
+    { "path": "/admin/telegram", "name": "Configuração Telegram no admin" }
+  ]
+}

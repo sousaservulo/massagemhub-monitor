@@ -2,7 +2,7 @@ name: MassagemHub Monitor
 
 on:
   schedule:
-    # Fortaleza (UTC-3): 00h, 06h, 12h e 18h
+    # Fortaleza/Brasília (UTC-3): 00h, 06h, 12h e 18h
     # GitHub Actions usa UTC: 03h, 09h, 15h e 21h.
     - cron: '0 3,9,15,21 * * *'
   workflow_dispatch:
@@ -15,7 +15,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  monitor:
+  seo-health:
+    name: SEO e saúde
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -27,12 +28,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+<<<<<<< HEAD
         
+=======
+>>>>>>> 3e7e746 (feat: adiciona pacote 2 com monitoramento E2E)
 
-      - name: Run tests
+      - name: Run unit tests
         run: npm test
 
-      - name: Monitor MassagemHub
+      - name: Monitor SEO e saúde
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_MONITOR_CHAT_ID: ${{ secrets.TELEGRAM_MONITOR_CHAT_ID }}
@@ -41,3 +45,46 @@ jobs:
           SEND_SUCCESS_SUMMARY: 'true'
           MONITOR_TIMEOUT_MS: '15000'
         run: npm run monitor
+
+  e2e:
+    name: Navegador E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Playwright package
+        run: npm install --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E checks
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_MONITOR_CHAT_ID: ${{ secrets.TELEGRAM_MONITOR_CHAT_ID }}
+          TELEGRAM_MONITOR_TOPIC_ID: ${{ secrets.TELEGRAM_MONITOR_TOPIC_ID }}
+          MASSAGEMHUB_BASE_URL: https://massagemhub.com.br
+          MASSAGEMHUB_ADVERTISER_EMAIL: ${{ secrets.MASSAGEMHUB_ADVERTISER_EMAIL }}
+          MASSAGEMHUB_ADVERTISER_PASSWORD: ${{ secrets.MASSAGEMHUB_ADVERTISER_PASSWORD }}
+          MASSAGEMHUB_ADMIN_EMAIL: ${{ secrets.MASSAGEMHUB_ADMIN_EMAIL }}
+          MASSAGEMHUB_ADMIN_PASSWORD: ${{ secrets.MASSAGEMHUB_ADMIN_PASSWORD }}
+          E2E_TIMEOUT_MS: '20000'
+          E2E_SCREENSHOTS: 'false'
+        run: npm run e2e
+
+      - name: Upload E2E screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: massagemhub-e2e-failures
+          path: artifacts/e2e/
+          if-no-files-found: ignore
+          retention-days: 7

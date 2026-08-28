@@ -1,173 +1,174 @@
+<<<<<<< HEAD
 # MassagemHub Monitor
+=======
+# MassagemHub Monitor — Pacotes 1 + 2
+>>>>>>> 3e7e746 (feat: adiciona pacote 2 com monitoramento E2E)
 
-Monitor externo de saúde e SEO do **MassagemHub**, executado pelo GitHub Actions 4 vezes por dia e com relatórios enviados ao Telegram.
+Monitor externo do MassagemHub executado pelo GitHub Actions **4 vezes ao dia**, com relatórios no Telegram.
 
-## O que esta versão monitora
+## Pacote 1 — SEO e saúde
 
-- disponibilidade HTTP das páginas críticas;
-- `robots.txt` e bloqueio acidental com `Disallow: /`;
-- `sitemap.xml` e todos os sitemaps filhos;
-- páginas importantes do MassagemHub;
-- `<title>`, meta description, canonical e meta robots;
-- inconsistência `URL no sitemap + noindex`;
-- inconsistência de páginas de estado/cidade entre sitemap e meta robots;
-- uma amostra automática de anúncios de terapeutas, clínicas e páginas do guia presentes no sitemap;
-- até 12 imagens por página monitorada, detectando imagens quebradas;
-- tempo médio das respostas;
-- alertas e resumo pelo Telegram.
+Verifica diretamente o site, sem gerar pesquisas ou cliques artificiais:
 
-> Esta versão **não faz pesquisas no Google, não clica em anúncios e não tenta gerar tráfego artificial**. Ela acessa diretamente o MassagemHub para verificar saúde e SEO.
+- HTTP das páginas críticas;
+- `robots.txt`;
+- `sitemap.xml` e sitemaps filhos;
+- title, description, canonical e meta robots;
+- inconsistência `sitemap + noindex`;
+- páginas de estado/cidade condicionais;
+- amostra automática de terapeutas, clínicas e páginas do guia;
+- imagens quebradas;
+- tempo de resposta.
+
+## Pacote 2 — Navegador E2E
+
+Usa **Playwright + Chromium headless** para verificar o comportamento real da aplicação.
+
+### Sempre testado
+
+- `/anunciante/login`;
+- `/admin/login`.
+
+### Com conta de monitoramento do anunciante
+
+- login real;
+- `/anunciante`;
+- `/anunciante/meu-anuncio`;
+- `/anunciante/financeiro`;
+- renderização da seção de fotos;
+- presença dos controles para definir foto principal quando aplicável.
+
+O teste **não envia formulários de edição, não troca foto, não exclui foto e não altera dados**.
+
+### Com conta de Admin
+
+- login real;
+- `/admin`;
+- `/admin/therapists`;
+- `/admin/clinics`;
+- `/admin/telegram`.
+
+Também são apenas acessos de leitura/navegação.
 
 ## Horários
 
-O workflow está configurado para rodar diariamente às:
+Configurado para:
 
 - 00:00
 - 06:00
 - 12:00
 - 18:00
 
-Horário de Fortaleza/Brasília (`UTC-3`). O cron do GitHub está convertido para UTC.
+Horário de Brasília/Fortaleza (UTC-3). Também é possível usar **Actions > MassagemHub Monitor > Run workflow**.
 
-Também é possível executar manualmente em **Actions > MassagemHub Monitor > Run workflow**.
+## Secrets já existentes
 
-## Telegram
+No GitHub:
 
-O monitor pode utilizar o **mesmo bot já utilizado pelo MassagemHub**. Crie um novo grupo para os relatórios do monitor, adicione o bot e configure os seguintes Secrets no novo repositório:
+`Settings > Secrets and variables > Actions`
 
-### Obrigatórios
-
-`TELEGRAM_BOT_TOKEN`
-
-Mesmo token do bot já utilizado pelo MassagemHub.
-
-`TELEGRAM_MONITOR_CHAT_ID`
-
-Chat ID do novo grupo do monitor.
-
-### Opcional
-
-`TELEGRAM_MONITOR_TOPIC_ID`
-
-Use somente se o grupo estiver configurado como fórum e você quiser enviar os relatórios para um tópico específico.
-
-## Como descobrir o chat ID do novo grupo
-
-1. Crie o grupo no Telegram.
-2. Adicione o bot que já é utilizado pelo MassagemHub.
-3. Envie qualquer mensagem no grupo.
-4. Abra no navegador, temporariamente:
-
-   `https://api.telegram.org/botSEU_TOKEN/getUpdates`
-
-5. Localize `chat.id` da mensagem do grupo. Grupos normalmente possuem um ID negativo, como `-100...`.
-6. Salve esse valor somente como Secret no GitHub. Não coloque o token ou chat ID no código.
-
-Se o bot já estiver consumindo updates por webhook e `getUpdates` não retornar a mensagem, obtenha o ID pelo mecanismo administrativo já usado no MassagemHub ou por um bot auxiliar de identificação de chat.
-
-## Configurando o GitHub
-
-Crie um repositório, por exemplo:
-
-`massagemhub-monitor`
-
-Depois envie estes arquivos para ele e configure:
-
-**Settings > Secrets and variables > Actions > New repository secret**
-
-Crie:
+Mantenha:
 
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_MONITOR_CHAT_ID`
-- opcionalmente `TELEGRAM_MONITOR_TOPIC_ID`
+- `TELEGRAM_MONITOR_TOPIC_ID` (opcional)
 
-Não é necessário criar `.env` no GitHub Actions.
+## Novos Secrets do Pacote 2
 
-## Lista de páginas
+Para habilitar os testes autenticados:
 
-As páginas fixas ficam em:
+- `MASSAGEMHUB_ADVERTISER_EMAIL`
+- `MASSAGEMHUB_ADVERTISER_PASSWORD`
+- `MASSAGEMHUB_ADMIN_EMAIL`
+- `MASSAGEMHUB_ADMIN_PASSWORD`
 
-`config/urls.json`
+Os valores ficam somente em **GitHub Secrets**. Não coloque credenciais no `.env` versionado, no código ou no README.
 
-A configuração inicial já contém:
+É recomendável usar uma conta de anunciante criada especificamente para monitoramento. O Admin pode ser uma conta com acesso suficiente para abrir as telas verificadas.
 
-- `/`
-- `/terapeutas`
-- `/terapeutas/rn`
-- `/terapeutas/rn/natal`
-- `/clinicas`
-- `/clinicas/rn`
-- `/clinicas/rn/natal`
-- `/guia-de-massagens`
-- `/anunciar`
-- `/planos`
+Se os Secrets de autenticação não existirem, o workflow **não quebra**: as páginas públicas de login são verificadas e os testes autenticados aparecem como `PULADO`.
 
-Além disso, a cada execução o monitor lê o sitemap e escolhe automaticamente algumas páginas reais de terapeutas, clínicas e do guia. Portanto, não precisamos cadastrar manualmente cada anúncio.
+## Screenshots
 
-## Páginas de estado/cidade e `noindex`
+Por padrão:
 
-No MassagemHub, páginas de estado/cidade podem legitimamente ficar com `noindex, follow` quando ainda não possuem resultados públicos. Por isso o monitor **não acusa automaticamente qualquer `noindex` nessas páginas**.
+`E2E_SCREENSHOTS=false`
 
-Ele cruza a página com o sitemap:
+Isso evita armazenar imagens de telas administrativas/anunciantes no GitHub. Se você decidir ativar, altere para `true` no workflow. Em falhas, os arquivos são enviados como artifact por 7 dias.
 
-- se estiver no sitemap e estiver `noindex` => **crítico**;
-- se não estiver no sitemap e permitir indexação => **aviso**;
-- se não estiver no sitemap e estiver `noindex` => comportamento esperado.
+Mesmo com screenshots ativados, o monitor não captura a tela de login após falha de autenticação, para evitar registrar o e-mail digitado.
 
-Isso segue a lógica existente no código Laravel do MassagemHub.
+## GitHub Actions
 
-## Mensagens
+O workflow possui dois jobs independentes:
 
-Sem problemas:
+1. **SEO e saúde** — Pacote 1;
+2. **Navegador E2E** — Pacote 2.
 
-```text
-MASSAGEMHUB MONITOR — TUDO OK
+Assim uma falha crítica do SEO não impede a execução dos testes de navegador e vice-versa.
 
-Páginas verificadas: 16
-Sitemap: OK (42 URLs)
-Robots: OK
-Resposta média: 320 ms
-Críticos: 0 | Avisos: 0
+### Correção incluída
 
-Nenhuma anomalia detectada nas páginas monitoradas.
+A configuração antiga usava `cache: npm` sem possuir `package-lock.json`, causando:
+
+`Dependencies lock file is not found`
+
+O Pacote 2 já remove essa configuração, portanto essa falha não deve se repetir.
+
+## Instalação do Playwright
+
+O GitHub Actions executa automaticamente:
+
+```bash
+npm install --no-audit --no-fund
+npx playwright install --with-deps chromium
 ```
 
-Com problema:
-
-```text
-MASSAGEMHUB MONITOR — ALERTA CRÍTICO
-
-Páginas verificadas: 16
-Sitemap: OK (42 URLs)
-Robots: OK
-Resposta média: 410 ms
-Críticos: 1 | Avisos: 0
-
-Problemas encontrados:
-[CRÍTICO] URL encontrada no sitemap está com noindex
-https://massagemhub.com.br/terapeuta/rn/exemplo
-```
+Não é necessário instalar Chromium manualmente no runner.
 
 ## Executar localmente
 
-Requer Node.js 20 ou superior.
-
 ```bash
 npm install
+npx playwright install chromium
 npm test
 npm run monitor
+npm run e2e
 ```
 
-Sem as variáveis do Telegram, o monitor executará normalmente e mostrará o relatório no terminal, mas não tentará enviar mensagem.
+Sem as credenciais de autenticação, o `npm run e2e` apenas testa as páginas públicas e pula as áreas protegidas.
 
-## Política de falhas no GitHub Actions
+## Configuração das páginas E2E
 
-- problema **crítico**: mensagem no Telegram + workflow fica vermelho;
-- **aviso**: mensagem no Telegram, mas execução permanece válida;
-- tudo OK: resumo no Telegram e workflow verde.
+As rotas ficam em:
 
-Para receber mensagem **somente quando houver problema**, altere no workflow:
+`config/e2e.json`
 
-```yaml
-SEND_SUCCESS_SUMMARY: 'false'
+Isso permite adicionar novas telas posteriormente sem reescrever o motor do monitor.
+
+## Telegram
+
+O Pacote 1 envia um relatório de SEO/saúde e o Pacote 2 envia um relatório E2E separado. Exemplos:
+
+```text
+MASSAGEMHUB E2E — TUDO OK
+
+Testes OK: 11
+Falhas: 0
+Pulados: 0
 ```
+<<<<<<< HEAD
+=======
+
+ou:
+
+```text
+MASSAGEMHUB E2E — ALERTA
+
+[OK] Login autenticado do anunciante
+[FALHA] Meu anúncio
+  HTTP 500 em /anunciante/meu-anuncio
+```
+
+Uma falha E2E deixa o job vermelho e envia a informação para o Telegram.
+>>>>>>> 3e7e746 (feat: adiciona pacote 2 com monitoramento E2E)
