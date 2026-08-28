@@ -28,10 +28,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-<<<<<<< HEAD
-        
-=======
->>>>>>> 3e7e746 (feat: adiciona pacote 2 com monitoramento E2E)
+
 
       - name: Run unit tests
         run: npm test
