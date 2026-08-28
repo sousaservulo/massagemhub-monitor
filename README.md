@@ -1,8 +1,8 @@
-# MassagemHub Monitor — Pacotes 1 + 2 + 3
+# MassagemHub Monitor 
 
 Monitor externo do MassagemHub executado pelo GitHub Actions **4 vezes ao dia**, com relatórios no Telegram. O projeto não pesquisa no Google, não clica em anúncios e não gera tráfego artificial.
 
-## Pacote 1 — SEO e saúde
+## SEO e saúde
 
 Verifica diretamente o site:
 
@@ -16,7 +16,7 @@ Verifica diretamente o site:
 - imagens quebradas;
 - tempo de resposta.
 
-## Pacote 2 — Navegador E2E
+## Navegador E2E
 
 Usa **Playwright + Chromium headless** para verificar o comportamento real da aplicação.
 
@@ -46,7 +46,7 @@ O teste **não envia formulários de edição, não troca foto, não exclui foto
 
 Também são somente acessos de leitura/navegação.
 
-## Pacote 3 — SEO inteligente e sentinela
+## SEO inteligente e sentinela
 
 ### Google Search Console
 
@@ -109,7 +109,7 @@ Em `Settings > Secrets and variables > Actions`:
 - `TELEGRAM_MONITOR_CHAT_ID`;
 - `TELEGRAM_MONITOR_TOPIC_ID` (opcional).
 
-## Secrets do Pacote 2
+## Secrets
 
 Todos opcionais:
 
@@ -187,15 +187,3 @@ config/e2e.json
 ```
 
 Isso permite adicionar novas telas posteriormente sem reescrever o motor.
-
-## Atualizar do Pacote 2
-
-Substitua os arquivos do repositório pelos do Pacote 3 e rode:
-
-```bash
-git add .
-git commit -m "feat: adiciona pacote 3 com Search Console e sentinela"
-git push
-```
-
-Depois execute manualmente o workflow. Sem Search Console e sem sentinela configurados, esses dois módulos apenas serão pulados; Pacotes 1 e 2 continuam funcionando normalmente.
