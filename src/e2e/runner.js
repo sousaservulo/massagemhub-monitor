@@ -66,7 +66,7 @@ async function login(page, config, kind, credentials, results) {
 
     await Promise.all([
       page.waitForLoadState('domcontentloaded'),
-      page.locator('button[type="submit"]').click()
+      page.getByRole('button', { name: /^Entrar$/i }).click()
     ]);
 
     const current = new URL(page.url());

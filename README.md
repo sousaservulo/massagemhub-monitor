@@ -1,10 +1,12 @@
-# MassagemHub Monitor 
+# MassagemHub Monitor — Pacote 3.1
 
-Monitor externo do MassagemHub executado pelo GitHub Actions **4 vezes ao dia**, com relatórios no Telegram. O projeto não pesquisa no Google, não clica em anúncios e não gera tráfego artificial.
+— Pacotes 1 + 2
 
-## SEO e saúde
+Monitor externo do MassagemHub executado pelo GitHub Actions **4 vezes ao dia**, com relatórios no Telegram.
 
-Verifica diretamente o site:
+## Pacote 1 — SEO e saúde
+
+Verifica diretamente o site, sem gerar pesquisas ou cliques artificiais:
 
 - HTTP das páginas críticas;
 - `robots.txt`;
@@ -16,7 +18,7 @@ Verifica diretamente o site:
 - imagens quebradas;
 - tempo de resposta.
 
-## Navegador E2E
+## Pacote 2 — Navegador E2E
 
 Usa **Playwright + Chromium headless** para verificar o comportamento real da aplicação.
 
@@ -25,14 +27,14 @@ Usa **Playwright + Chromium headless** para verificar o comportamento real da ap
 - `/anunciante/login`;
 - `/admin/login`.
 
-### Com conta do anunciante
+### Com conta de monitoramento do anunciante
 
 - login real;
 - `/anunciante`;
 - `/anunciante/meu-anuncio`;
 - `/anunciante/financeiro`;
-- seção de fotos;
-- controles para definir foto principal quando aplicável.
+- renderização da seção de fotos;
+- presença dos controles para definir foto principal quando aplicável.
 
 O teste **não envia formulários de edição, não troca foto, não exclui foto e não altera dados**.
 
@@ -44,51 +46,7 @@ O teste **não envia formulários de edição, não troca foto, não exclui foto
 - `/admin/clinics`;
 - `/admin/telegram`.
 
-Também são somente acessos de leitura/navegação.
-
-## SEO inteligente e sentinela
-
-### Google Search Console
-
-Integração opcional, somente leitura, com a Search Console API. A cada execução calcula duas janelas consecutivas de 7 dias, encerrando em D-2 para reduzir o efeito do atraso de consolidação do Google.
-
-O relatório no Telegram informa:
-
-- cliques dos últimos 7 dias e variação contra os 7 anteriores;
-- impressões e variação;
-- CTR;
-- posição média;
-- top páginas por cliques;
-- top consultas por cliques;
-- quantidade de sitemaps cadastrados e sitemaps com erro/aviso;
-- alertas de quedas relevantes.
-
-Os limites padrão evitam alertas por oscilações pequenas:
-
-- queda de impressões: 40%, apenas quando o período anterior tinha pelo menos 50 impressões;
-- queda de cliques: 50%, apenas quando o período anterior tinha pelo menos 10 cliques;
-- piora de posição média: 5 posições, respeitando o volume mínimo.
-
-Por padrão, uma queda gera **aviso no Telegram, mas não deixa o workflow vermelho** (`GSC_FAIL_ON_ALERT=false`). Erros de autenticação/API continuam deixando o job vermelho.
-
-### Perfil sentinela
-
-Permite escolher um dos perfis de exemplo já existentes e tratá-lo como referência pública. É opcional e não precisa criar outro anunciante.
-
-Quando configurado, valida:
-
-- HTTP 200;
-- carregamento do perfil público;
-- `title`;
-- ausência de `noindex`;
-- presença opcional de um texto esperado, como o nome do perfil de exemplo.
-
-Use **Repository variables**, pois a URL e o texto do perfil não são credenciais:
-
-- `MASSAGEMHUB_SENTINEL_PUBLIC_URL` — exemplo: `/terapeutas/rn/natal/nome-do-perfil`;
-- `MASSAGEMHUB_SENTINEL_EXPECT` — exemplo: nome público do perfil.
-
-Se a variável não existir, o job aparece como sucesso e informa que a checagem foi pulada.
+Também são apenas acessos de leitura/navegação.
 
 ## Horários
 
@@ -99,70 +57,72 @@ Configurado para:
 - 12:00
 - 18:00
 
-Horário de Brasília/Fortaleza (UTC-3). Também é possível executar manualmente em **Actions > MassagemHub Monitor > Run workflow**.
+Horário de Brasília/Fortaleza (UTC-3). Também é possível usar **Actions > MassagemHub Monitor > Run workflow**.
 
-## Secrets do Telegram
+## Secrets já existentes
 
-Em `Settings > Secrets and variables > Actions`:
+No GitHub:
 
-- `TELEGRAM_BOT_TOKEN`;
-- `TELEGRAM_MONITOR_CHAT_ID`;
-- `TELEGRAM_MONITOR_TOPIC_ID` (opcional).
+`Settings > Secrets and variables > Actions`
 
-## Secrets
+Mantenha:
 
-Todos opcionais:
+- `TELEGRAM_BOT_TOKEN`
+- `TELEGRAM_MONITOR_CHAT_ID`
+- `TELEGRAM_MONITOR_TOPIC_ID` (opcional)
 
-- `MASSAGEMHUB_ADVERTISER_EMAIL`;
-- `MASSAGEMHUB_ADVERTISER_PASSWORD`;
-- `MASSAGEMHUB_ADMIN_EMAIL`;
-- `MASSAGEMHUB_ADMIN_PASSWORD`.
+## Novos Secrets do Pacote 2
 
-Sem credenciais, os testes autenticados são marcados como `PULADO` em vez de falhar.
+Para habilitar os testes autenticados:
 
-## Configurando o Google Search Console — Pacote 3
+- `MASSAGEMHUB_ADVERTISER_EMAIL`
+- `MASSAGEMHUB_ADVERTISER_PASSWORD`
+- `MASSAGEMHUB_ADMIN_EMAIL`
+- `MASSAGEMHUB_ADMIN_PASSWORD`
 
-A integração usa **Service Account** e permissão somente leitura.
+Os valores ficam somente em **GitHub Secrets**. Não coloque credenciais no `.env` versionado, no código ou no README.
 
-1. No Google Cloud, crie ou use um projeto e habilite a **Google Search Console API**.
-2. Crie uma **Service Account**.
-3. Gere uma chave JSON para essa Service Account.
-4. Copie o e-mail `client_email` presente no JSON.
-5. No Google Search Console, abra a propriedade do MassagemHub e adicione esse e-mail como usuário com permissão de leitura suficiente para consultar os dados.
-6. No GitHub, crie o Secret `GOOGLE_SERVICE_ACCOUNT_JSON` e cole **todo o conteúdo do JSON** da chave como valor.
+É recomendável usar uma conta de anunciante criada especificamente para monitoramento. O Admin pode ser uma conta com acesso suficiente para abrir as telas verificadas.
 
-Nunca coloque esse JSON no repositório, `.env`, commit ou README.
+Se os Secrets de autenticação não existirem, o workflow **não quebra**: as páginas públicas de login são verificadas e os testes autenticados aparecem como `PULADO`.
 
-A propriedade padrão usada pelo workflow é:
-
-```text
-sc-domain:massagemhub.com.br
-```
-
-Se a propriedade cadastrada no Search Console for do tipo URL Prefix em vez de Domain Property, altere `GSC_SITE_URL` no workflow para o valor exato da propriedade, por exemplo `https://massagemhub.com.br/`.
-
-Se `GOOGLE_SERVICE_ACCOUNT_JSON` não estiver configurado, o job é pulado com sucesso. Portanto você pode subir e testar o Pacote 3 antes de configurar a API.
-
-## Jobs do GitHub Actions
-
-O workflow possui quatro jobs independentes:
-
-1. **SEO e saúde** — Pacote 1;
-2. **Perfil sentinela** — Pacote 3, opcional;
-3. **Navegador E2E** — Pacote 2;
-4. **Google Search Console** — Pacote 3, opcional.
-
-Uma falha de um módulo não impede os demais de executarem.
-
-## Screenshots E2E
+## Screenshots
 
 Por padrão:
 
-```text
-E2E_SCREENSHOTS=false
+`E2E_SCREENSHOTS=false`
+
+Isso evita armazenar imagens de telas administrativas/anunciantes no GitHub. Se você decidir ativar, altere para `true` no workflow. Em falhas, os arquivos são enviados como artifact por 7 dias.
+
+Mesmo com screenshots ativados, o monitor não captura a tela de login após falha de autenticação, para evitar registrar o e-mail digitado.
+
+## GitHub Actions
+
+O workflow possui dois jobs independentes:
+
+1. **SEO e saúde** — Pacote 1;
+2. **Navegador E2E** — Pacote 2.
+
+Assim uma falha crítica do SEO não impede a execução dos testes de navegador e vice-versa.
+
+### Correção incluída
+
+A configuração antiga usava `cache: npm` sem possuir `package-lock.json`, causando:
+
+`Dependencies lock file is not found`
+
+O Pacote 2 já remove essa configuração, portanto essa falha não deve se repetir.
+
+## Instalação do Playwright
+
+O GitHub Actions executa automaticamente:
+
+```bash
+npm install --no-audit --no-fund
+npx playwright install --with-deps chromium
 ```
 
-Isso evita armazenar telas administrativas/anunciantes no GitHub. Se ativado, screenshots de falhas são mantidos como artifact por 7 dias. O monitor evita screenshot da tela após falha de autenticação para não registrar o e-mail digitado.
+Não é necessário instalar Chromium manualmente no runner.
 
 ## Executar localmente
 
@@ -171,19 +131,44 @@ npm install
 npx playwright install chromium
 npm test
 npm run monitor
-npm run sentinel
 npm run e2e
-npm run gsc
 ```
 
-`sentinel` e `gsc` encerram normalmente quando suas configurações opcionais não existem.
+Sem as credenciais de autenticação, o `npm run e2e` apenas testa as páginas públicas e pula as áreas protegidas.
 
 ## Configuração das páginas E2E
 
 As rotas ficam em:
 
+`config/e2e.json`
+
+Isso permite adicionar novas telas posteriormente sem reescrever o motor do monitor.
+
+## Telegram
+
+O Pacote 1 envia um relatório de SEO/saúde e o Pacote 2 envia um relatório E2E separado. Exemplos:
+
 ```text
-config/e2e.json
+MASSAGEMHUB E2E — TUDO OK
+
+Testes OK: 11
+Falhas: 0
+Pulados: 0
 ```
 
-Isso permite adicionar novas telas posteriormente sem reescrever o motor.
+ou:
+
+```text
+MASSAGEMHUB E2E — ALERTA
+
+[OK] Login autenticado do anunciante
+[FALHA] Meu anúncio
+  HTTP 500 em /anunciante/meu-anuncio
+```
+
+Uma falha E2E deixa o job vermelho e envia a informação para o Telegram.
+
+
+## Pacote 3.1
+
+Corrige o login E2E do Admin e do anunciante para usar o botão acessível `Entrar`, compatível com os formulários reais do MassagemHub, que não definem explicitamente `type="submit"`.
