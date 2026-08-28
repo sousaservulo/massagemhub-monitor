@@ -42,6 +42,30 @@ jobs:
           MONITOR_TIMEOUT_MS: '15000'
         run: npm run monitor
 
+  sentinel:
+    name: Perfil sentinela
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check public sentinel profile
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_MONITOR_CHAT_ID: ${{ secrets.TELEGRAM_MONITOR_CHAT_ID }}
+          TELEGRAM_MONITOR_TOPIC_ID: ${{ secrets.TELEGRAM_MONITOR_TOPIC_ID }}
+          MASSAGEMHUB_BASE_URL: https://massagemhub.com.br
+          MASSAGEMHUB_SENTINEL_PUBLIC_URL: ${{ vars.MASSAGEMHUB_SENTINEL_PUBLIC_URL }}
+          MASSAGEMHUB_SENTINEL_EXPECT: ${{ vars.MASSAGEMHUB_SENTINEL_EXPECT }}
+        run: npm run sentinel
+
   e2e:
     name: Navegador E2E
     runs-on: ubuntu-latest
@@ -84,3 +108,32 @@ jobs:
           path: artifacts/e2e/
           if-no-files-found: ignore
           retention-days: 7
+
+  search-console:
+    name: Google Search Console
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Search Console intelligence
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_MONITOR_CHAT_ID: ${{ secrets.TELEGRAM_MONITOR_CHAT_ID }}
+          TELEGRAM_MONITOR_TOPIC_ID: ${{ secrets.TELEGRAM_MONITOR_TOPIC_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GSC_SITE_URL: sc-domain:massagemhub.com.br
+          GSC_MIN_IMPRESSIONS: '50'
+          GSC_MIN_CLICKS: '10'
+          GSC_IMPRESSIONS_DROP_PCT: '40'
+          GSC_CLICKS_DROP_PCT: '50'
+          GSC_POSITION_WORSE_BY: '5'
+          GSC_FAIL_ON_ALERT: 'false'
+        run: npm run gsc
