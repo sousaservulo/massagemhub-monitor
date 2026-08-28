@@ -1,0 +1,14 @@
+{
+  "name": "massagemhub-monitor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monitor externo de saúde e SEO do MassagemHub",
+  "type": "module",
+  "scripts": {
+    "monitor": "node src/index.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

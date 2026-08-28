@@ -1,0 +1,35 @@
+{
+  "baseUrl": "https://massagemhub.com.br",
+  "criticalPages": [
+    "/",
+    "/terapeutas",
+    "/terapeutas/rn",
+    "/terapeutas/rn/natal",
+    "/clinicas",
+    "/clinicas/rn",
+    "/clinicas/rn/natal",
+    "/guia-de-massagens",
+    "/anunciar",
+    "/planos"
+  ],
+  "alwaysIndexablePages": [
+    "/",
+    "/terapeutas",
+    "/clinicas",
+    "/guia-de-massagens",
+    "/anunciar",
+    "/planos"
+  ],
+  "conditionalIndexablePages": [
+    "/terapeutas/rn",
+    "/terapeutas/rn/natal",
+    "/clinicas/rn",
+    "/clinicas/rn/natal"
+  ],
+  "sampleFromSitemap": {
+    "enabled": true,
+    "therapists": 2,
+    "clinics": 2,
+    "guidePages": 2
+  }
+}
