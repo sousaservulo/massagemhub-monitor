@@ -1,4 +1,4 @@
-# MassagemHub Monitor — Pacote 1
+# MassagemHub Monitor
 
 Monitor externo de saúde e SEO do **MassagemHub**, executado pelo GitHub Actions 4 vezes por dia e com relatórios enviados ao Telegram.
 
@@ -171,16 +171,3 @@ Para receber mensagem **somente quando houver problema**, altere no workflow:
 ```yaml
 SEND_SUCCESS_SUMMARY: 'false'
 ```
-
-## Próximo pacote
-
-O Pacote 2 pode adicionar Playwright para testar o comportamento real da aplicação, por exemplo:
-
-- login do anunciante;
-- abertura da edição de anúncio;
-- troca de foto principal usando perfil de teste;
-- acesso ao Admin;
-- validação de telas críticas;
-- screenshots automáticos quando houver erro.
-
-Esses testes devem utilizar contas específicas de automação, nunca contas reais de anunciantes.
